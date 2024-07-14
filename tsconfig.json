@@ -6,8 +6,8 @@
         "esModuleInterop": true,
         "moduleResolution": "nodenext",
         "sourceMap": true,
-        "outDir": "dist",
-        "declarationDir": "dist/types",
+        "outDir": "api",
+        "declarationDir": "api/types",
         "lib": [
             "ESNext",
         ],
@@ -25,7 +25,7 @@
     ],
     "exclude": [
         "node_modules",
-        "dist",
+        "api",
     ],
     "ts-node": {
         "esm": true,
