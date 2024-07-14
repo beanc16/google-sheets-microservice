@@ -12,5 +12,10 @@
     "routes": [{
         "src": "/(.*)",
         "dest": "api/index.js"
-    }]
+    }],
+    "git": {
+        "deploymentEnabled": {
+            "main": false
+        }
+    }
 }
