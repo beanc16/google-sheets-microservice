@@ -4,7 +4,7 @@
     "outputDirectory": "dist",
     "functions": {
         "dist/**/*.js": {
-            "runtime": "@vercel/node"
+            "runtime": "@vercel/node@18.14.1"
         }
     },
     "rewrites": [{
