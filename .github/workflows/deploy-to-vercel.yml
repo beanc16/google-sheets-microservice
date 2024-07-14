@@ -30,7 +30,7 @@ jobs:
     - name: Install Dependencies
       run: npm install
       env:
-        # This is necessary to pull in our private packages hosted on the GitHub Packages registry.
+        # This is necessary to pull in private packages hosted on the GitHub Packages registry.
         GITHUB_PRIVATE_PACKAGES_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_ACCESS_TOKEN }}
     - name: Build
       run: npm run build
