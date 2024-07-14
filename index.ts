@@ -8,9 +8,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 
-import { config } from './constants.js';
-import { errorRoutes } from './all/index.js';
-import { v1Routes } from './v1/index.js';
+import { config } from './src/constants.js';
+import { errorRoutes } from './src/all/index.js';
+import { v1Routes } from './src/v1/index.js';
 
 // Setup
 dotenv.config();
