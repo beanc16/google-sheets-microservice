@@ -59,4 +59,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
         with:
           args:
-            '❌ {{ EVENT_PAYLOAD.repository.full_name }} cancelled deployed'
+            '❌ {{ EVENT_PAYLOAD.repository.full_name }} cancelled deployment'
