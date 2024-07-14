@@ -3,7 +3,9 @@
     "buildCommand": "npm run build",
     "outputDirectory": "dist",
     "functions": {
-        "dist/**/*.js": {}
+        "dist/**/*.js": {
+            "runtime": "@vercel/node"
+        }
     },
     "rewrites": [{
         "source": "/(.*)",
