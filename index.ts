@@ -8,7 +8,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 
-import { config } from './src/constants.js';
 import { errorRoutes } from './src/all/index.js';
 import { v1Routes } from './src/v1/index.js';
 
@@ -63,7 +62,7 @@ app.use((
  * PORT *
  ********/
 
-app.listen(config.port, function ()
+app.listen(process.env.PORT, function ()
 {
-    logger.info(`App listening on port ${config.port}`);
+    logger.info(`App listening on port ${process.env.PORT}`);
 });
