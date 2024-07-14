@@ -1,0 +1,62 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Node
+      uses: actions/setup-node@v3
+    - name: Install Vercel
+      run: npm install -g vercel@latest
+    - name: Install Dependencies
+      run: npm install
+      env:
+        # This is necessary to pull in our private packages hosted on the GitHub Packages registry.
+        GITHUB_PRIVATE_PACKAGES_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_ACCESS_TOKEN }}
+    - name: Build
+      run: npm run build
+    - name: Pull Vercel Environment Information
+      run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+    - name: Build Vercel Project Artifacts
+      run: vercel build --prod --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+    - name: Deploy Vercel Project Artifacts
+      run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+
+  notify-discord:
+    runs-on: ubuntu-latest
+    needs: [
+      deploy,
+    ]
+    name: Notify Discord
+    steps:
+      - name: Notify Discord on Success
+        if: success()
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
+        with:
+          args:
+            '✅ {{ EVENT_PAYLOAD.repository.full_name }} successfully deployed'
+      - name: Notify Discord on Failure
+        if: failure()
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
+        with:
+          args:
+            '❌ {{ EVENT_PAYLOAD.repository.full_name }} failed to deployed'
+      - name: Notify Discord on Cancel
+        if: cancelled()
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
+        with:
+          args:
+            '❌ {{ EVENT_PAYLOAD.repository.full_name }} cancelled deployed'
