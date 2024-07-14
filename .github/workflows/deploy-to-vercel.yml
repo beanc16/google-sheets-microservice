@@ -6,6 +6,18 @@ on:
       - main
 
 jobs:
+  notify-discord-start:
+    runs-on: ubuntu-latest
+    name: Notify Discord on Start Deployment
+    steps:
+      - name: Notify Discord on Start
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
+        with:
+          args:
+            '💬 {{ EVENT_PAYLOAD.repository.full_name }} is starting deployment'
+
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -29,12 +41,12 @@ jobs:
     - name: Deploy Vercel Project Artifacts
       run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
 
-  notify-discord:
+  notify-discord-finish:
     runs-on: ubuntu-latest
     needs: [
       deploy,
     ]
-    name: Notify Discord
+    name: Notify Discord on Finish Deployment
     steps:
       - name: Notify Discord on Success
         if: success()
