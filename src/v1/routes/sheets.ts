@@ -5,5 +5,5 @@ import * as handlers from '../handlers/sheets.js';
 
 export const sheetsRoutes = express();
 
-sheetsRoutes.get('/range', authenticateTokenServiceToService, handlers.getRange);
-sheetsRoutes.get('/ranges', authenticateTokenServiceToService, handlers.getRanges);
+sheetsRoutes.post('/range', authenticateTokenServiceToService, handlers.getRange);
+sheetsRoutes.post('/ranges', authenticateTokenServiceToService, handlers.getRanges);
