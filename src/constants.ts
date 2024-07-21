@@ -1,4 +1,4 @@
-// import fs from 'fs';
+import fs from 'fs';
 
 export enum SpreadSheetId {
     PtuEdenEncounterTables = 'ptuEdenEncounterTables',
@@ -27,25 +27,24 @@ export interface PokedexEntry
 
 const readPokedexes = () =>
 {
-    // const pokedexDirectory = 'src/v1/files/ptu/pokedexes';
-    // const pokedexFiles = fs.readdirSync(pokedexDirectory);
+    const pokedexDirectory = 'src/v1/files/ptu/pokedexes';
+    const pokedexFiles = fs.readdirSync(pokedexDirectory);
 
-    // const combinedPokedex = pokedexFiles.reduce((acc, cur) =>
-    // {
-    //     const data = fs.readFileSync(`${pokedexDirectory}/${cur}`);
-    //     const parsedData = JSON.parse(data.toString()) as PokedexEntry[];
+    const combinedPokedex = pokedexFiles.reduce((acc, cur) =>
+    {
+        const data = fs.readFileSync(`${pokedexDirectory}/${cur}`);
+        const parsedData = JSON.parse(data.toString()) as PokedexEntry[];
 
-    //     parsedData.forEach((dexEntry) =>
-    //     {
-    //         const { name } = dexEntry;
-    //         acc[name] = dexEntry;
-    //     });
+        parsedData.forEach((dexEntry) =>
+        {
+            const { name } = dexEntry;
+            acc[name] = dexEntry;
+        });
 
-    //     return acc;
-    // }, {} as Record<string, PokedexEntry>);
+        return acc;
+    }, {} as Record<string, PokedexEntry>);
 
-    // return combinedPokedex;
-    return {} as Record<string, PokedexEntry>;
+    return combinedPokedex;
 };
 
 export const pokedex = readPokedexes();
