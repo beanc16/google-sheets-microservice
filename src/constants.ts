@@ -28,24 +28,32 @@ export interface PokedexEntry
 
 const readPokedexes = () =>
 {
-    const pokedexDirectory = 'src/v1/files/ptu/pokedexes';
-    const pokedexFiles = fs.readdirSync(pokedexDirectory);
-
-    const combinedPokedex = pokedexFiles.reduce((acc, cur) =>
+    try
     {
-        const data = fs.readFileSync(`${pokedexDirectory}/${cur}`);
-        const parsedData = JSON.parse(data.toString()) as PokedexEntry[];
-
-        parsedData.forEach((dexEntry) =>
+        const pokedexDirectory = 'src/v1/files/ptu/pokedexes';
+        const pokedexFiles = fs.readdirSync(pokedexDirectory);
+    
+        const combinedPokedex = pokedexFiles.reduce((acc, cur) =>
         {
-            const { name } = dexEntry;
-            acc[name] = dexEntry;
-        });
+            const data = fs.readFileSync(`${pokedexDirectory}/${cur}`);
+            const parsedData = JSON.parse(data.toString()) as PokedexEntry[];
+    
+            parsedData.forEach((dexEntry) =>
+            {
+                const { name } = dexEntry;
+                acc[name] = dexEntry;
+            });
+    
+            return acc;
+        }, {} as Record<string, PokedexEntry>);
+    
+        return combinedPokedex;
+    }
 
-        return acc;
-    }, {} as Record<string, PokedexEntry>);
-
-    return combinedPokedex;
+    catch (error)
+    {
+        return {} as Record<string, PokedexEntry>;
+    }
 };
 
 export const pokedex = readPokedexes();
