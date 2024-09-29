@@ -27,5 +27,30 @@ export const getRangeSchema = Joi.alternatives([
 ]).required();
 
 export const getRangesSchema = Joi.object({
-    ranges: Joi.array().items(getRangeSchema).min(1).required(),
+    ranges: Joi.array().items(
+        getRangeSchema
+    ).min(1).required(),
 }).required();
+
+// Update
+const updateValuesSchema = Joi.array().items(
+    Joi.array().items(
+        Joi.string().required(),
+    ).min(1).required()
+).min(1).required();
+
+const baseUpdate = {
+    ...baseGetRange,
+    values: updateValuesSchema,
+};
+
+export const updateSchema = Joi.alternatives([
+    Joi.object({
+        spreadsheet: spreadsheetSchema,
+        ...baseUpdate,
+    }),
+    Joi.object({
+        spreadsheetId: stringSchema,
+        ...baseUpdate,
+    }),
+]).required();

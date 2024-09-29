@@ -3,7 +3,7 @@ import express from 'express';
 import { GetRangesParameters, GoogleSheetsClient } from '../services/googleSheetsClient.js';
 import { MajorDimension, SpreadSheetId, spreadsheetIds, spreadsheetIdsToEnum } from '../../constants.js';
 import { validateJoiSchema } from '../validation/validators.js';
-import { getRangeSchema, getRangesSchema } from '../validation/sheets.js';
+import { getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
 import { CompositeKeyRecord } from '../services/CompositeKeyRecord.js';
 import { logger } from '@beanc16/logger';
 
@@ -133,6 +133,49 @@ export const getRange = async (req: express.Request, res: express.Response): Pro
             spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
             range: range,
             majorDimension: majorDimension,
+        });
+
+        Success.json({
+            res,
+            data: values!,
+        });
+    }
+    catch (err: any)
+    {
+        handleGoogleSheetsClientError(res, err);
+    }
+};
+
+export const update = async (req: express.Request, res: express.Response): Promise<void> =>
+{
+    const {
+        body: {
+            spreadsheetId,
+            spreadsheet,
+            range,
+            majorDimension = MajorDimension.Rows,
+            values: inputValues = [],
+        } = {},
+        body = {}, // TODO: Type this later
+    } = req;
+
+    validateJoiSchema(updateSchema, body, res);
+
+    try
+    {
+        const {
+            updatedData: {
+                values = [],
+            } = {},
+        } = await GoogleSheetsClient.update({
+            spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
+            range,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: {
+                range,
+                majorDimension,
+                values: inputValues,
+            },
         });
 
         Success.json({
