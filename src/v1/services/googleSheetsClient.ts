@@ -88,4 +88,28 @@ export class GoogleSheetsClient
         const rows = await this.client.spreadsheets.values.append(parameters);
         return rows.data;
     }
+
+    public static async batchGetByDataFilter(parameters: sheets_v4.Params$Resource$Spreadsheets$Values$Batchgetbydatafilter): Promise<sheets_v4.Schema$BatchGetValuesByDataFilterResponse>
+    {
+        this.initialize();
+
+        const rows = await this.client.spreadsheets.values.batchGetByDataFilter(parameters);
+        return rows.data;
+    }
+
+    public static async batchUpdateByDataFilter(parameters: sheets_v4.Params$Resource$Spreadsheets$Values$Batchupdatebydatafilter): Promise<sheets_v4.Schema$BatchUpdateValuesByDataFilterResponse>
+    {
+        this.initialize();
+
+        const rows = await this.client.spreadsheets.values.batchUpdateByDataFilter(parameters);
+        return rows.data;
+    }
+
+    public static async batchClearByDataFilter(parameters: sheets_v4.Params$Resource$Spreadsheets$Values$Batchclearbydatafilter): Promise<sheets_v4.Schema$BatchClearValuesByDataFilterResponse>
+    {
+        this.initialize();
+
+        const rows = await this.client.spreadsheets.values.batchClearByDataFilter(parameters);
+        return rows.data;
+    }
 }
