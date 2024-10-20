@@ -54,3 +54,5 @@ export const updateSchema = Joi.alternatives([
         ...baseUpdate,
     }),
 ]).required();
+
+export const appendSchema = updateSchema;

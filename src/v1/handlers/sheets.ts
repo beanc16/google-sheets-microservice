@@ -3,7 +3,7 @@ import express from 'express';
 import { GetRangesParameters, GoogleSheetsClient } from '../services/googleSheetsClient.js';
 import { MajorDimension, SpreadSheetId, spreadsheetIds, spreadsheetIdsToEnum } from '../../constants.js';
 import { validateJoiSchema } from '../validation/validators.js';
-import { getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
+import { appendSchema, getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
 import { CompositeKeyRecord } from '../services/CompositeKeyRecord.js';
 import { logger } from '@beanc16/logger';
 
@@ -168,6 +168,51 @@ export const update = async (req: express.Request, res: express.Response): Promi
                 values = [],
             } = {},
         } = await GoogleSheetsClient.update({
+            spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
+            range,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: {
+                range,
+                majorDimension,
+                values: inputValues,
+            },
+        });
+
+        Success.json({
+            res,
+            data: values!,
+        });
+    }
+    catch (err: any)
+    {
+        handleGoogleSheetsClientError(res, err);
+    }
+};
+
+export const append = async (req: express.Request, res: express.Response): Promise<void> =>
+{
+    const {
+        body: {
+            spreadsheetId,
+            spreadsheet,
+            range,
+            majorDimension = MajorDimension.Rows,
+            values: inputValues = [],
+        } = {},
+        body = {}, // TODO: Type this later
+    } = req;
+
+    validateJoiSchema(appendSchema, body, res);
+
+    try
+    {
+        const {
+            updates: {
+                updatedData: {
+                    values = [],
+                } = {},
+            } = {},
+        } = await GoogleSheetsClient.append({
             spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
             range,
             valueInputOption: 'USER_ENTERED',
