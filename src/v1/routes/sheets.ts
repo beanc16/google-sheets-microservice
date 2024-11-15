@@ -7,5 +7,6 @@ export const sheetsRoutes = express();
 
 sheetsRoutes.post('/range', authenticateTokenServiceToService, handlers.getRange);
 sheetsRoutes.post('/ranges', authenticateTokenServiceToService, handlers.getRanges);
+sheetsRoutes.post('/titles', authenticateTokenServiceToService, handlers.getSheetTitles);
 sheetsRoutes.post('/range/append', authenticateTokenServiceToService, handlers.append);
 sheetsRoutes.patch('/range', authenticateTokenServiceToService, handlers.update);

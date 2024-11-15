@@ -3,7 +3,7 @@ import express from 'express';
 import { GetRangesParameters, GoogleSheetsClient } from '../services/googleSheetsClient.js';
 import { MajorDimension, SpreadSheetId, spreadsheetIds, spreadsheetIdsToEnum } from '../../constants.js';
 import { validateJoiSchema } from '../validation/validators.js';
-import { appendSchema, getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
+import { appendSchema, getPageTitlesSchema, getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
 import { CompositeKeyRecord } from '../services/CompositeKeyRecord.js';
 import { logger } from '@beanc16/logger';
 
@@ -138,6 +138,35 @@ export const getRange = async (req: express.Request, res: express.Response): Pro
         Success.json({
             res,
             data: values!,
+        });
+    }
+    catch (err: any)
+    {
+        handleGoogleSheetsClientError(res, err);
+    }
+};
+
+export const getSheetTitles = async (req: express.Request, res: express.Response): Promise<void> =>
+{
+    const {
+        body: {
+            spreadsheetId,
+            spreadsheet,
+        } = {},
+        body = {}, // TODO: Type this later
+    } = req;
+
+    validateJoiSchema(getPageTitlesSchema, body, res);
+
+    try
+    {
+        const titles = await GoogleSheetsClient.getPageTitles({
+            spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
+        });
+
+        Success.json({
+            res,
+            data: { titles },
         });
     }
     catch (err: any)

@@ -32,6 +32,15 @@ export const getRangesSchema = Joi.object({
     ).min(1).required(),
 }).required();
 
+export const getPageTitlesSchema = Joi.alternatives([
+    Joi.object({
+        spreadsheet: spreadsheetSchema,
+    }),
+    Joi.object({
+        spreadsheetId: stringSchema,
+    }),
+]).required();
+
 // Update
 const updateValuesSchema = Joi.array().items(
     Joi.array().items(
