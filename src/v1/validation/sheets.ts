@@ -1,12 +1,11 @@
 import Joi from 'joi';
-import { MajorDimension, spreadsheetIds } from '../../constants.js';
+import { GoogleSheetsMicroserviceFilter, MajorDimension } from '../../constants.js';
 
 const validMajorDimensions = Object.keys(MajorDimension);
-const validSpreadsheetIds = Object.keys(spreadsheetIds);
+const validFilters = Object.values(GoogleSheetsMicroserviceFilter);
 
 // Resuable Schemas
 const stringSchema = Joi.string().min(1).required();
-const spreadsheetSchema = Joi.string().valid(...validSpreadsheetIds).required();
 const majorDimensionSchema = Joi.string().valid(...validMajorDimensions).optional();
 
 // Get Range
@@ -15,16 +14,17 @@ const baseGetRange = {
     majorDimension: majorDimensionSchema,
 };
 
-export const getRangeSchema = Joi.alternatives([
+const getTitlesFilters = Joi.array().items(
     Joi.object({
-        spreadsheet: spreadsheetSchema,
-        ...baseGetRange,
-    }),
-    Joi.object({
-        spreadsheetId: stringSchema,
-        ...baseGetRange,
-    }),
-]).required();
+        type: Joi.string().valid(...validFilters).required(),
+        values: Joi.array().items(stringSchema).min(1).required(),
+    }).optional(),
+).optional();
+
+export const getRangeSchema = Joi.object({
+    spreadsheetId: stringSchema,
+    ...baseGetRange,
+}).required();
 
 export const getRangesSchema = Joi.object({
     ranges: Joi.array().items(
@@ -32,36 +32,20 @@ export const getRangesSchema = Joi.object({
     ).min(1).required(),
 }).required();
 
-export const getPageTitlesSchema = Joi.alternatives([
-    Joi.object({
-        spreadsheet: spreadsheetSchema,
-    }),
-    Joi.object({
-        spreadsheetId: stringSchema,
-    }),
-]).required();
+export const getPageTitlesSchema = Joi.object({
+    spreadsheetId: stringSchema,
+    filters: getTitlesFilters,
+}).required();
 
 // Update
 const updateValuesSchema = Joi.array().items(
-    Joi.array().items(
-        Joi.string().required(),
-    ).min(1).required()
+    Joi.array().items(stringSchema).min(1).required()
 ).min(1).required();
 
-const baseUpdate = {
+export const updateSchema = Joi.object({
+    spreadsheetId: stringSchema,
     ...baseGetRange,
     values: updateValuesSchema,
-};
-
-export const updateSchema = Joi.alternatives([
-    Joi.object({
-        spreadsheet: spreadsheetSchema,
-        ...baseUpdate,
-    }),
-    Joi.object({
-        spreadsheetId: stringSchema,
-        ...baseUpdate,
-    }),
-]).required();
+}).required();
 
 export const appendSchema = updateSchema;

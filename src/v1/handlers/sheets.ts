@@ -1,7 +1,7 @@
 import DotnetResponses from 'dotnet-responses';
 import express from 'express';
 import { GetRangesParameters, GoogleSheetsClient } from '../services/googleSheetsClient.js';
-import { MajorDimension, SpreadSheetId, spreadsheetIds, spreadsheetIdsToEnum } from '../../constants.js';
+import { GoogleSheetsMicroserviceFilter, MajorDimension } from '../../constants.js';
 import { validateJoiSchema } from '../validation/validators.js';
 import { appendSchema, getPageTitlesSchema, getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
 import { CompositeKeyRecord } from '../services/CompositeKeyRecord.js';
@@ -44,13 +44,10 @@ const parseGetRangesInput = (ranges: any[]): CompositeKeyRecord<[string, MajorDi
         cur: any // TODO: Type this later
     ) => {
         const {
-            spreadsheetId: unparsedSpreadsheetId,
-            spreadsheet,
+            spreadsheetId,
             range,
             majorDimension = MajorDimension.Rows,
         } = cur;
-
-        const spreadsheetId = unparsedSpreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId];
 
         const parameters = acc.Get([spreadsheetId, majorDimension]) || {
             spreadsheetId,
@@ -92,19 +89,9 @@ export const getRanges = async (req: express.Request, res: express.Response): Pr
         );
         const results = await Promise.all(promises);
 
-        // Add spreadsheet name to the results if it exists
-        const parsedResults = results.map((result) => {
-            const { spreadsheetId } = result;
-            const spreadsheet = spreadsheetIdsToEnum[spreadsheetId as string];
-            return {
-                spreadsheet,
-                ...result,
-            };
-        });
-
         Success.json({
             res,
-            data: parsedResults,
+            data: results,
         });
     }
     catch (err: any)
@@ -118,7 +105,6 @@ export const getRange = async (req: express.Request, res: express.Response): Pro
     const {
         body: {
             spreadsheetId,
-            spreadsheet,
             range,
             majorDimension = MajorDimension.Rows,
         } = {},
@@ -130,7 +116,7 @@ export const getRange = async (req: express.Request, res: express.Response): Pro
     try
     {
         const { values = [] } = await GoogleSheetsClient.getRange({
-            spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
+            spreadsheetId,
             range: range,
             majorDimension: majorDimension,
         });
@@ -146,12 +132,66 @@ export const getRange = async (req: express.Request, res: express.Response): Pro
     }
 };
 
+const filterTitles = (unfilteredTitles: string[], unprocessedFilters: {
+    type: GoogleSheetsMicroserviceFilter;
+    values: string[];
+}[]): string[] =>
+{
+    if (unprocessedFilters.length === 0)
+    {
+        return unfilteredTitles;
+    }
+
+    const filters = unprocessedFilters.map(filter =>
+    {
+        const valuesArray = filter.values.map(value => value.toLowerCase());
+        const valuesSet = new Set(valuesArray);
+
+        return {
+            type: filter.type,
+            valuesArray,
+            valuesSet,
+        };
+    });
+
+    const handlerMap: Record<GoogleSheetsMicroserviceFilter, (
+        title: string,
+        values: {
+            valuesArray: string[];
+            valuesSet: Set<string>;
+        },
+    ) => boolean> =
+    {
+        [GoogleSheetsMicroserviceFilter.CaseInsensitiveIncludes]: (title, { valuesArray }) =>
+            valuesArray.some(value => title.toLowerCase().includes(value)),
+
+        [GoogleSheetsMicroserviceFilter.CaseInsensitiveExcludes]: (title, { valuesArray }) =>
+            !valuesArray.some(value => title.toLowerCase().includes(value)),
+
+        [GoogleSheetsMicroserviceFilter.CaseInsensitiveMatch]: (title, { valuesSet }) =>
+            valuesSet.has(title.toLowerCase()),
+
+        [GoogleSheetsMicroserviceFilter.CaseInsensitiveNoMatch]: (title, { valuesSet }) =>
+            !valuesSet.has(title.toLowerCase()),
+    };
+
+    return unfilteredTitles.filter(title =>
+    {
+        const lowercaseTitle = title.toLowerCase();
+
+        return filters.some(filter =>
+        {
+            return handlerMap[filter.type](lowercaseTitle, filter);
+        });
+    });
+};
+
 export const getSheetTitles = async (req: express.Request, res: express.Response): Promise<void> =>
 {
     const {
         body: {
             spreadsheetId,
-            spreadsheet,
+            filters = [],
         } = {},
         body = {}, // TODO: Type this later
     } = req;
@@ -160,9 +200,11 @@ export const getSheetTitles = async (req: express.Request, res: express.Response
 
     try
     {
-        const titles = await GoogleSheetsClient.getPageTitles({
-            spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
+        const unfilteredTitles = await GoogleSheetsClient.getPageTitles({
+            spreadsheetId,
         });
+
+        const titles = filterTitles(unfilteredTitles, filters);
 
         Success.json({
             res,
@@ -180,7 +222,6 @@ export const update = async (req: express.Request, res: express.Response): Promi
     const {
         body: {
             spreadsheetId,
-            spreadsheet,
             range,
             majorDimension = MajorDimension.Rows,
             values: inputValues = [],
@@ -197,7 +238,7 @@ export const update = async (req: express.Request, res: express.Response): Promi
                 values = [],
             } = {},
         } = await GoogleSheetsClient.update({
-            spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
+            spreadsheetId,
             range,
             valueInputOption: 'USER_ENTERED',
             requestBody: {
@@ -223,7 +264,6 @@ export const append = async (req: express.Request, res: express.Response): Promi
     const {
         body: {
             spreadsheetId,
-            spreadsheet,
             range,
             majorDimension = MajorDimension.Rows,
             values: inputValues = [],
@@ -242,7 +282,7 @@ export const append = async (req: express.Request, res: express.Response): Promi
                 } = {},
             } = {},
         } = await GoogleSheetsClient.append({
-            spreadsheetId: spreadsheetId ?? spreadsheetIds[spreadsheet as SpreadSheetId],
+            spreadsheetId: spreadsheetId,
             range,
             valueInputOption: 'USER_ENTERED',
             requestBody: {

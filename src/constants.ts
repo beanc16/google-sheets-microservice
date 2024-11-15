@@ -1,21 +1,17 @@
 import fs from 'fs';
 
-export enum SpreadSheetId {
-    PtuEdenEncounterTables = 'ptuEdenEncounterTables',
-}
-
-export const spreadsheetIds = {
-    [SpreadSheetId.PtuEdenEncounterTables]: '1n5cs_kQX26sWuRK3cYTyoIDDylinw7IvppYPjizilhY',
-};
-
-export const spreadsheetIdsToEnum = Object.entries(spreadsheetIds).reduce((acc, [name, id]) => {
-    acc[id] = name as SpreadSheetId;
-    return acc;
-}, {} as Record<string, SpreadSheetId>);
-
 export enum MajorDimension {
     Rows = 'ROWS',
     Columns = 'COLUMNS',
+}
+
+// TODO: Move to microservices abstraction
+export enum GoogleSheetsMicroserviceFilter
+{
+    CaseInsensitiveMatch = 'case_insensitive_match',
+    CaseInsensitiveIncludes = 'case_insensitive_includes',
+    CaseInsensitiveNoMatch = 'case_insensitive_no_match',
+    CaseInsensitiveExcludes = 'case_insensitive_excludes',
 }
 
 // ---> TODO: Delete local-only code later
