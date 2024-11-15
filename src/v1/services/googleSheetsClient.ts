@@ -33,6 +33,33 @@ export class GoogleSheetsClient
         return this.client;
     }
 
+    public static async getPageTitles(parameters: sheets_v4.Params$Resource$Spreadsheets$Values$Get): Promise<string[]>
+    {
+        this.initialize();
+
+        const {
+            data: {
+                sheets = [],
+            },
+        } = await this.client.spreadsheets.get({
+            spreadsheetId: parameters.spreadsheetId,
+            fields: 'sheets/properties/title',
+        });
+        const titles = sheets.reduce<string[]>((acc, { properties = {} }) => 
+        {
+            const { title } = properties;
+
+            if (title)
+            {
+                acc.push(title);
+            }
+
+            return acc;
+        }, []);
+
+        return titles;
+    }
+
     public static async getRange(parameters: sheets_v4.Params$Resource$Spreadsheets$Values$Get): Promise<sheets_v4.Schema$ValueRange>
     {
         this.initialize();
