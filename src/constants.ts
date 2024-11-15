@@ -5,15 +5,6 @@ export enum MajorDimension {
     Columns = 'COLUMNS',
 }
 
-// TODO: Move to microservices abstraction
-export enum GoogleSheetsMicroserviceFilter
-{
-    CaseInsensitiveMatch = 'case_insensitive_match',
-    CaseInsensitiveIncludes = 'case_insensitive_includes',
-    CaseInsensitiveNoMatch = 'case_insensitive_no_match',
-    CaseInsensitiveExcludes = 'case_insensitive_excludes',
-}
-
 // ---> TODO: Delete local-only code later
 export interface PokedexEntry
 {

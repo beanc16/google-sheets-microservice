@@ -1,11 +1,13 @@
+import { logger } from '@beanc16/logger';
+import { GoogleSheetsMicroserviceFilter, GoogleSheetsMicroserviceFilterType } from '@beanc16/microservices-abstraction';
 import DotnetResponses from 'dotnet-responses';
 import express from 'express';
+
 import { GetRangesParameters, GoogleSheetsClient } from '../services/googleSheetsClient.js';
-import { GoogleSheetsMicroserviceFilter, MajorDimension } from '../../constants.js';
+import { MajorDimension } from '../../constants.js';
+import { CompositeKeyRecord } from '../services/CompositeKeyRecord.js';
 import { validateJoiSchema } from '../validation/validators.js';
 import { appendSchema, getPageTitlesSchema, getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
-import { CompositeKeyRecord } from '../services/CompositeKeyRecord.js';
-import { logger } from '@beanc16/logger';
 
 const { Success, InternalServerError, getResponseByStatusCode } = DotnetResponses;
 
@@ -132,10 +134,7 @@ export const getRange = async (req: express.Request, res: express.Response): Pro
     }
 };
 
-const filterTitles = (unfilteredTitles: string[], unprocessedFilters: {
-    type: GoogleSheetsMicroserviceFilter;
-    values: string[];
-}[]): string[] =>
+const filterTitles = (unfilteredTitles: string[], unprocessedFilters: GoogleSheetsMicroserviceFilter[]): string[] =>
 {
     if (unprocessedFilters.length === 0)
     {
@@ -154,7 +153,7 @@ const filterTitles = (unfilteredTitles: string[], unprocessedFilters: {
         };
     });
 
-    const handlerMap: Record<GoogleSheetsMicroserviceFilter, (
+    const handlerMap: Record<GoogleSheetsMicroserviceFilterType, (
         title: string,
         values: {
             valuesArray: string[];
@@ -162,16 +161,16 @@ const filterTitles = (unfilteredTitles: string[], unprocessedFilters: {
         },
     ) => boolean> =
     {
-        [GoogleSheetsMicroserviceFilter.CaseInsensitiveIncludes]: (title, { valuesArray }) =>
+        [GoogleSheetsMicroserviceFilterType.CaseInsensitiveIncludes]: (title, { valuesArray }) =>
             valuesArray.some(value => title.toLowerCase().includes(value)),
 
-        [GoogleSheetsMicroserviceFilter.CaseInsensitiveExcludes]: (title, { valuesArray }) =>
+        [GoogleSheetsMicroserviceFilterType.CaseInsensitiveExcludes]: (title, { valuesArray }) =>
             !valuesArray.some(value => title.toLowerCase().includes(value)),
 
-        [GoogleSheetsMicroserviceFilter.CaseInsensitiveMatch]: (title, { valuesSet }) =>
+        [GoogleSheetsMicroserviceFilterType.CaseInsensitiveMatch]: (title, { valuesSet }) =>
             valuesSet.has(title.toLowerCase()),
 
-        [GoogleSheetsMicroserviceFilter.CaseInsensitiveNoMatch]: (title, { valuesSet }) =>
+        [GoogleSheetsMicroserviceFilterType.CaseInsensitiveNoMatch]: (title, { valuesSet }) =>
             !valuesSet.has(title.toLowerCase()),
     };
 

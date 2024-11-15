@@ -1,8 +1,9 @@
+import { GoogleSheetsMicroserviceFilterType } from '@beanc16/microservices-abstraction';
 import Joi from 'joi';
-import { GoogleSheetsMicroserviceFilter, MajorDimension } from '../../constants.js';
+import { MajorDimension } from '../../constants.js';
 
 const validMajorDimensions = Object.keys(MajorDimension);
-const validFilters = Object.values(GoogleSheetsMicroserviceFilter);
+const validFilters = Object.values(GoogleSheetsMicroserviceFilterType);
 
 // Resuable Schemas
 const stringSchema = Joi.string().min(1).required();
