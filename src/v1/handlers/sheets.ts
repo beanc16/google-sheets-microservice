@@ -254,9 +254,11 @@ export const getBatchSheetTitles = async (req: express.Request, res: express.Res
 
         const result = clientResponse.map(({ spreadsheetId, titles }) =>
         {
+            const curFilters = spreadsheetIdToFilters[spreadsheetId];
+
             return {
                 spreadsheetId,
-                titles: filterTitles(titles, filters),
+                titles: filterTitles(titles, curFilters),
             };
         })
 
