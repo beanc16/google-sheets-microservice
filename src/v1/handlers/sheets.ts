@@ -178,7 +178,7 @@ const filterTitles = (unfilteredTitles: string[], unprocessedFilters: GoogleShee
     {
         const lowercaseTitle = title.toLowerCase();
 
-        return filters.some(filter =>
+        return filters.every(filter =>
         {
             return handlerMap[filter.type](lowercaseTitle, filter);
         });
