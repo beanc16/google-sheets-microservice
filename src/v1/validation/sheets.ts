@@ -44,7 +44,7 @@ export const getBatchPageTitlesSchema = Joi.object({
             spreadsheetId: stringSchema,
             filters: getTitlesFilters,
         }).required(),
-    ).min(1).max(100).required(),
+    ).unique().min(1).max(100).required(),
     filters: getTitlesFilters,
 }).required();
 
