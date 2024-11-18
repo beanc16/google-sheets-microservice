@@ -6,7 +6,10 @@ import * as handlers from '../handlers/sheets.js';
 export const sheetsRoutes = express();
 
 sheetsRoutes.post('/range', authenticateTokenServiceToService, handlers.getRange);
-sheetsRoutes.post('/ranges', authenticateTokenServiceToService, handlers.getRanges);
 sheetsRoutes.post('/titles', authenticateTokenServiceToService, handlers.getSheetTitles);
 sheetsRoutes.post('/range/append', authenticateTokenServiceToService, handlers.append);
-sheetsRoutes.patch('/range', authenticateTokenServiceToService, handlers.update);
+
+// Bulk endpoints
+sheetsRoutes.post('/ranges', authenticateTokenServiceToService, handlers.getRanges);
+sheetsRoutes.patch('/ranges', authenticateTokenServiceToService, handlers.update);
+sheetsRoutes.post('/batch/titles', authenticateTokenServiceToService, handlers.getBatchSheetTitles);

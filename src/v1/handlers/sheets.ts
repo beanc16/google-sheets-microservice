@@ -7,7 +7,7 @@ import { GetRangesParameters, GoogleSheetsClient } from '../services/googleSheet
 import { MajorDimension } from '../../constants.js';
 import { CompositeKeyRecord } from '../services/CompositeKeyRecord.js';
 import { validateJoiSchema } from '../validation/validators.js';
-import { appendSchema, getPageTitlesSchema, getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
+import { appendSchema, getBatchPageTitlesSchema, getPageTitlesSchema, getRangeSchema, getRangesSchema, updateSchema } from '../validation/sheets.js';
 
 const { Success, InternalServerError, getResponseByStatusCode } = DotnetResponses;
 
@@ -208,6 +208,61 @@ export const getSheetTitles = async (req: express.Request, res: express.Response
         Success.json({
             res,
             data: { titles },
+        });
+    }
+    catch (err: any)
+    {
+        handleGoogleSheetsClientError(res, err);
+    }
+};
+
+export const getBatchSheetTitles = async (req: express.Request, res: express.Response): Promise<void> =>
+{
+    const {
+        body: {
+            spreadsheetMetadata = [],
+            filters = [],
+        } = {},
+        body = {}, // TODO: Type this later
+    } = req;
+
+    validateJoiSchema(getBatchPageTitlesSchema, body, res);
+
+    // @ts-ignore -- TODO: Fix this later
+    const { spreadsheetIdSet, spreadsheetIdToFilters } = spreadsheetMetadata.reduce((acc: {
+        spreadsheetIdSet: Set<string>;
+        spreadsheetIdToFilters: Record<string, string[]>;
+    }, { spreadsheetId = '', filters: innerFilters = [] }) =>
+    {
+        acc.spreadsheetIdSet.add(spreadsheetId);
+        acc.spreadsheetIdToFilters[spreadsheetId] = [
+            ...filters,
+            ...innerFilters,
+        ];
+
+        return acc;
+    }, {
+        spreadsheetIdSet: new Set<string>(),
+        spreadsheetIdToFilters: {},
+    });
+
+    try
+    {
+        const clientResponse = await GoogleSheetsClient.getPageTitlesBatch({
+            spreadsheetIds: [...spreadsheetIdSet],
+        });
+
+        const result = clientResponse.map(({ spreadsheetId, titles }) =>
+        {
+            return {
+                spreadsheetId,
+                titles: filterTitles(titles, filters),
+            };
+        })
+
+        Success.json({
+            res,
+            data: result,
         });
     }
     catch (err: any)
