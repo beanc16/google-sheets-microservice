@@ -264,7 +264,7 @@ export const getBatchSheetTitles = async (req: express.Request, res: express.Res
 
         Success.json({
             res,
-            data: result,
+            data: { spreadsheets: result },
         });
     }
     catch (err: any)
