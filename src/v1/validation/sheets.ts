@@ -18,7 +18,7 @@ const baseGetRange = {
 const getTitlesFilters = Joi.array().items(
     Joi.object({
         type: Joi.string().valid(...validFilters).required(),
-        values: Joi.array().items(stringSchema).min(1).max(100).required(),
+        values: Joi.array().items(stringSchema).min(1).max(500).required(),
     }).optional(),
 ).max(1000).optional();
 
@@ -30,7 +30,7 @@ export const getRangeSchema = Joi.object({
 export const getRangesSchema = Joi.object({
     ranges: Joi.array().items(
         getRangeSchema
-    ).min(1).max(100).required(),
+    ).min(1).max(500).required(),
 }).required();
 
 export const getPageTitlesSchema = Joi.object({
@@ -44,13 +44,13 @@ export const getBatchPageTitlesSchema = Joi.object({
             spreadsheetId: stringSchema,
             filters: getTitlesFilters,
         }).required(),
-    ).unique().min(1).max(100).required(),
+    ).unique().min(1).max(500).required(),
     filters: getTitlesFilters,
 }).required();
 
 // Update
 const updateValuesSchema = Joi.array().items(
-    Joi.array().items(stringSchema).min(1).max(100).required()
+    Joi.array().items(stringSchema).min(1).max(500).required()
 ).min(1).max(1000).required();
 
 export const updateSchema = Joi.object({
