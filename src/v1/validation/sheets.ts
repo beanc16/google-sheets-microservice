@@ -20,7 +20,7 @@ const getTitlesFilters = Joi.array().items(
         type: Joi.string().valid(...validFilters).required(),
         values: Joi.array().items(stringSchema).min(1).max(500).required(),
     }).optional(),
-).max(1000).optional();
+).max(5000).optional();
 
 export const getRangeSchema = Joi.object({
     spreadsheetId: stringSchema,
@@ -30,7 +30,7 @@ export const getRangeSchema = Joi.object({
 export const getRangesSchema = Joi.object({
     ranges: Joi.array().items(
         getRangeSchema
-    ).min(1).max(500).required(),
+    ).min(1).max(5000).required(),
 }).required();
 
 export const getPageTitlesSchema = Joi.object({
