@@ -12,7 +12,7 @@
     "vercel-build": "npm run build",
     "build": "rm -rf api && tsc",
     "start": "node api/index.js",
-    "start:dev": "nodemon src/index.ts"
+    "start:dev": "node --loader ts-node/esm --watch index.ts"
   },
   "dependencies": {
     "@beanc16/jwt-helpers": "^1.0.4",
