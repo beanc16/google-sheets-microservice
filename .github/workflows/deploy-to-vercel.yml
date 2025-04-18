@@ -48,6 +48,7 @@ jobs:
     needs: [
       deploy,
     ]
+    if: always()
     name: Notify Discord on Finish Deployment
     steps:
       - name: Notify Discord on Success
