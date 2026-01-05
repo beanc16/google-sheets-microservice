@@ -52,7 +52,7 @@ jobs:
     name: Notify Discord on Finish Deployment
     steps:
       - name: Notify Discord on Success
-        if: success()
+        if: needs.deploy.result == 'success'
         uses: Ilshidur/action-discord@0.3.2
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
@@ -60,7 +60,7 @@ jobs:
           args:
             '✅ {{ EVENT_PAYLOAD.repository.full_name }} successfully deployed'
       - name: Notify Discord on Failure
-        if: failure()
+        if: needs.deploy.result == 'failure'
         uses: Ilshidur/action-discord@0.3.2
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
@@ -68,7 +68,7 @@ jobs:
           args:
             '❌ {{ EVENT_PAYLOAD.repository.full_name }} failed to deployed'
       - name: Notify Discord on Cancel
-        if: cancelled()
+        if: needs.deploy.result == 'cancelled'
         uses: Ilshidur/action-discord@0.3.2
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_NOTIFICATION_WEBHOOK }}
