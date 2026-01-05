@@ -6,7 +6,7 @@ const validMajorDimensions = Object.keys(MajorDimension);
 const validFilters = Object.values(GoogleSheetsMicroserviceFilterType);
 
 // Resuable Schemas
-const stringSchema = Joi.string().min(1).required();
+const stringSchema = Joi.string().required();
 const majorDimensionSchema = Joi.string().valid(...validMajorDimensions).optional();
 
 // Get Range
