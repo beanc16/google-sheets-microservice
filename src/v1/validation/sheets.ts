@@ -8,6 +8,11 @@ const validFilters = Object.values(GoogleSheetsMicroserviceFilterType);
 // Resuable Schemas
 const stringSchema = Joi.string().allow('').required();
 const majorDimensionSchema = Joi.string().valid(...validMajorDimensions).optional();
+const valueInputOptionSchema = Joi.string().valid(
+    'USER_ENTERED',
+    'RAW',
+    'INPUT_VALUE_UNSPECIFIED',
+).optional();
 
 // Get Range
 const baseGetRange = {
@@ -57,6 +62,7 @@ export const updateSchema = Joi.object({
     spreadsheetId: stringSchema,
     ...baseGetRange,
     values: updateValuesSchema,
+    valueInputOption: valueInputOptionSchema,
 }).required();
 
 export const appendSchema = updateSchema;

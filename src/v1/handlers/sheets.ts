@@ -280,6 +280,7 @@ export const update = async (req: express.Request, res: express.Response): Promi
             spreadsheetId,
             range,
             majorDimension = MajorDimension.Rows,
+            valueInputOption = 'USER_ENTERED',
             values: inputValues = [],
         } = {},
         body = {}, // TODO: Type this later
@@ -296,7 +297,7 @@ export const update = async (req: express.Request, res: express.Response): Promi
         } = await GoogleSheetsClient.update({
             spreadsheetId,
             range,
-            valueInputOption: 'USER_ENTERED',
+            valueInputOption,
             requestBody: {
                 range,
                 majorDimension,
@@ -322,6 +323,7 @@ export const append = async (req: express.Request, res: express.Response): Promi
             spreadsheetId,
             range,
             majorDimension = MajorDimension.Rows,
+            valueInputOption = 'USER_ENTERED',
             values: inputValues = [],
         } = {},
         body = {}, // TODO: Type this later
@@ -340,7 +342,7 @@ export const append = async (req: express.Request, res: express.Response): Promi
         } = await GoogleSheetsClient.append({
             spreadsheetId: spreadsheetId,
             range,
-            valueInputOption: 'USER_ENTERED',
+            valueInputOption,
             requestBody: {
                 range,
                 majorDimension,
